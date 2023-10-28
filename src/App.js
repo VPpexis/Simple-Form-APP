@@ -1,24 +1,22 @@
-import logo from './logo.svg';
 import './App.css';
+import DashboardPage from './screens/DashboardPage';
+import ReportPage from './screens/ReportPage';
+import { Route, Router, Routes } from 'react-router-dom';
+import TopNav from './components/TopNav.js';
+import FormUI from './/screens/FormUI.js';
+import FinishUI from './/screens/FinishUI.js';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div>
+        <TopNav />
+        <Routes>
+          <Route path='/' element={<FormUI />}></Route>
+          <Route path='/finish' element={<FinishUI />}></Route>
+          <Route path='/dashboard' element={<DashboardPage />}></Route>
+          <Route path='/dashboard/report/:id' element={<ReportPage />}></Route>
+        </Routes>
+      </div>
   );
 }
 
