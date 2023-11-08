@@ -8,6 +8,7 @@ import styled from "@emotion/styled";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DateField } from '@mui/x-date-pickers/';
+import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from "dayjs";
 
 const VisuallyHiddenInput = styled('input')({
@@ -30,8 +31,11 @@ export default function ReportView() {
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
     const [screenHeight, setScreenHeight] = useState(window.innerHeight)
     const [imageURLs, setImageURLs] = useState([]);
+    const [imageGoodURLs, setImageGoodURLs] = useState([]);
+    const [imageBadURLs, setImageBadURLs] = useState([]);
     const [badIlluUpload, setBadIlluUpload] = useState(null);
     const [goodIlluUpload, setGoodIlluUpload] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     let navigate = useNavigate();
     const routeChange = () => {
@@ -43,10 +47,19 @@ export default function ReportView() {
         setData({...data, [e.target.id]: e.target.value})   
         dataVar = {...dataVar, [e.target.id]: e.target.value}
     };
+
+    const deleteGoodFileHandler = () => {
+        setGoodIlluUpload(null);
+    }
+
+    const deleteBadFileHandler = () => {
+        setBadIlluUpload(null);
+    }
+
     const handleGoodIlluChange = (e) => {   setGoodIlluUpload(e.target.files[0])    };
     const handleBadIlluChange = (e) => {    
         setBadIlluUpload(e.target.files[0]);
-        console.log(badIlluUpload)}
+        }
     const performedDateHandler = (date) => { setData({...data, performedDate: `${date.$D}-${date.$M}-${date.$y}`}); };
     const verifiedDateHandler = (date) => { setData({...data, verifiedDate: `${date.$D}-${date.$M}-${date.$y}`}); };
 
@@ -69,8 +82,8 @@ export default function ReportView() {
         const st = firebase.storage();
         const dataRef = db.ref(`data/${id}`);
         const storageRef = st.ref(`${id}`)
-        const fileRef1 = storageRef.child(`/goodIllu/${id}goodIllu.png`);
-        const fileRef2 = storageRef.child(`/badIllu/${id}badIllu.png`);
+        const fileRef1 = storageRef.child(`/goodIllu/${id}.png`);
+        const fileRef2 = storageRef.child(`/badIllu/${id}.png`);
         fileRef1.put(goodIlluUpload);
         fileRef2.put(badIlluUpload);
         console.log(dataVar);
@@ -83,24 +96,32 @@ export default function ReportView() {
         const db = firebase.database();
         const dataRef = db.ref(`data/${id}`);
 
-        if (goodIlluUpload != null || badIlluUpload != null) {
+        if (goodIlluUpload != null) {
             const st = firebase.storage();
             const storageRef = st.ref(`${id}`);
-            const fileRef1 = storageRef.child(`/goodIlllu/${id}goodIllu.png`);
-            const fileRef2 = storageRef.child(`/badIllu/${id}badIllu.png`);
+            const fileRef1 = storageRef.child(`/goodIlllu/${id}.png`);
             fileRef1.put(goodIlluUpload);
-            fileRef2.put(badIlluUpload);
+        }
+        if (badIlluUpload != null) {
+            const st = firebase.storage();
+            const storageRef = st.ref(`${id}`);
+            const fileRef = storageRef.child(`/badIllu/${id}.png`);
+            fileRef.put(badIlluUpload);
         }
         console.log(dataVar);
+        setIsUploading(true);
         dataRef.set(dataVar);
+        navigate('/dashboard');
     }
 
     const onGenerateClicked = () => {
+        /* 
         dataVar = {...dataVar, 
             illustration2: badIlluUpload,
             illustration3: goodIlluUpload,
         };
-        console.log('datavar', data)
+        */
+        console.log('datavar', dataVar)
         generatePDF(dataVar);
     }
 
@@ -130,6 +151,8 @@ export default function ReportView() {
         fetchData();
 
         const storageRef = firebase.storage().ref(`${id}`);
+        const storageGoodRef = firebase.storage().ref(`${id}/goodIllu/${id}.png`);
+        const storageBadRef = firebase.storage().ref(`${id}/badIllu/${id}.png`);
         storageRef.listAll()
             .then((result) => {
                 const downloadPromises = result.items.map((item) => {
@@ -148,14 +171,34 @@ export default function ReportView() {
             .catch((error) => {
                 console.error('Error retrieveing images: ', error);
             });
+
+        storageGoodRef.getDownloadURL()
+            .then((url) => {
+                dataVar = {...dataVar, illustration2: url};
+                setImageGoodURLs(url);
+            })
+            .catch((err) => {
+                console.log("storageGoodRef Error: ", err);
+            })
         
+        storageBadRef.getDownloadURL()
+            .then((url) => {
+                dataVar = {...dataVar, illustration3: url}
+                setImageBadURLs(url);
+            })
+            .catch((err) => {
+                console.log("storageGoodRef Error: ", err);
+            })
+        
+
         window.addEventListener('resize', handleResize);
         console.log('raw_data', data);
+        setIsUploading(false);
 
         return () => {
             window.removeEventListener('resize', handleResize);
         }
-    }, [id]);
+    }, [id, isUploading]);
 
     return (
         <Box
@@ -446,11 +489,26 @@ export default function ReportView() {
                             </Button>
                             { badIlluUpload && (
                                 <Box>
-                                    <Typography variant='body1'>
-                                        File upload: {badIlluUpload.name}
-                                    </Typography>
+                                    <Stack direction='row'>
+                                        <Typography variant='body1'>
+                                        File Upload: {badIlluUpload.name}
+                                        </Typography>
+                                        <Button startIcon={<DeleteIcon/>} onClick={deleteBadFileHandler}></Button>
+                                    </Stack>
                                 </Box>
+                                
                             )}
+                            { imageBadURLs && (
+                                <ImageList
+                                sx = {{width: screenWidth*.8, height: 500}}
+                                cols={1}
+                                >
+                                    <ImageListItem>
+                                        <img src={`${imageBadURLs}`} alt=''/>
+                                    </ImageListItem>
+                                </ImageList>
+                            )
+                            }
                         </Stack>
                         <Stack>
                             <Typography>Good (Illustration of the Ideal State)</Typography>
@@ -462,10 +520,24 @@ export default function ReportView() {
                                 />
                             </Button>
                             { goodIlluUpload && (
-                                <Typography variant='body1'>
-                                    File upload: {goodIlluUpload.name}
-                                </Typography>
+                                <Stack direction='row'>
+                                    <Typography variant='body1'>
+                                    File Upload: {goodIlluUpload.name}
+                                    </Typography>
+                                    <Button startIcon={<DeleteIcon/>} onClick={deleteGoodFileHandler}></Button>
+                                </Stack>
                             )}
+                            { imageGoodURLs && (
+                                <ImageList
+                                sx = {{width: screenWidth*.8, height: 500}}
+                                cols={1}
+                                >
+                                    <ImageListItem>
+                                        <img src={`${imageGoodURLs}`} alt=''/>
+                                    </ImageListItem>
+                                </ImageList>
+                            )
+                            }
                         </Stack>
                     </Stack>
                     <Stack mb={3} spacing={2}>

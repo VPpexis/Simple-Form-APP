@@ -93,11 +93,13 @@ export default async function generatePDF(data) {
     if (data.verifiedDate != undefined) verifiedDateTextField.setText(data.verifiedDate);
 
     if (data.illustration2 != undefined) {
-        const unit8ArrayImg = await data.illustration2.arrayBuffer();
+        const unit8ArrayImg = await fetch(data.illustration2).then(res => res.arrayBuffer());
+        console.log("illu2: ",unit8ArrayImg)
         const pngImage = await pdfDoc.embedPng(unit8ArrayImg);
         let pngDims = pngImage.scale(0.25);
-
+        
         pngDims = imgResize(250, 300, pngDims);
+
         secondPage.drawImage(pngImage, {
             x: 45,
             y: 220,
@@ -107,8 +109,9 @@ export default async function generatePDF(data) {
     }
 
     if (data.illustration3 != undefined) {
-        const unit8ArrayImg = await data.illustration3.arrayBuffer();
-        const pngImage = await pdfDoc.embedPng(unit8ArrayImg);
+        const unit8ArrayImg = await fetch(data.illustration3).then(res => res.arrayBuffer());
+        console.log("illu3: ",unit8ArrayImg)
+        const pngImage = await pdfDoc.embedPng(unit8ArrayImg).catch((err) => console.log("illu3 err: ",err));
         let pngDims = pngImage.scale(0.25);
 
         pngDims = imgResize(250, 300, pngDims);

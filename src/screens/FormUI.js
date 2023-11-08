@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Box, AppBar, TextField, Stack, Select, Button, MenuItem } from '@mui/material/';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import { dataObj } from '../scripts/dataObj.js';
 import firebase from '../scripts/initFirebase';
@@ -15,7 +16,9 @@ const db = firebase.database();
 const st = firebase.storage();
 
 export default function FormUI() {
-    const [data, setData] = useState({});
+    const [data, setData] = useState({
+        defectDescription: "What is the problem: \nWhy is it the problem: \nWho detected the problem: \nWhen it was detected: \nWhere it was detected: \nWhere it was detected: \nHow it was detected: ",
+    });
     const [date, setDate] = useState(new dayjs());
     const [fileUpload, setFileUpload] = useState();
     const [screenSize, setScreenSize] = useState({
@@ -51,6 +54,10 @@ export default function FormUI() {
             height:window.innerHeight
         });
     };
+
+    const deleteFileHandler = () => {
+        setFileUpload(null);
+    }
 
     const changeHandler = (e) => {
         setData({...data, [e.target.id]: e.target.value})
@@ -309,6 +316,7 @@ export default function FormUI() {
                             multiline
                             id='defectDescription'
                             onChange={changeHandler}
+                            value={data.defectDescription}
                             label= 'Defect Description'
                             maxRows= {5}
                             minRows= {5}
@@ -452,9 +460,13 @@ export default function FormUI() {
                                 />
                             </Button>
                             { fileUpload && (
-                                <Typography variant='body1'>
+                                <Stack direction='row'>
+                                    <Typography variant='body1'>
                                     File Upload: {fileUpload.name}
-                                </Typography>
+                                    </Typography>
+                                    <Button startIcon={<DeleteIcon/>} onClick={deleteFileHandler}></Button>
+                                </Stack>
+                                
                             )}
                          </Stack>
                          <Box
