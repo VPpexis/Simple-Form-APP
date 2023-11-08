@@ -1,4 +1,4 @@
-import { Box, Button, Divider, ImageList, ImageListItem, Stack, TextField, Typography, makeStyles } from "@mui/material";
+import { Box, Button, Divider, ImageList, ImageListItem, Select, Stack, TextField, Typography, makeStyles } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import generatePDF from '../scripts/generatePDF';
@@ -50,6 +50,19 @@ export default function ReportView() {
     const performedDateHandler = (date) => { setData({...data, performedDate: `${date.$D}-${date.$M}-${date.$y}`}); };
     const verifiedDateHandler = (date) => { setData({...data, verifiedDate: `${date.$D}-${date.$M}-${date.$y}`}); };
 
+    const onRemoveClicked = () => {
+        const db = firebase.database();
+        const dataRef = db.ref(`data/${id}`);
+        dataRef.remove().then(() => {
+            console.log('Document successfuly deleted.');
+            let path = '/dashboard';
+            navigate(path)
+        }).catch((error) => {
+            console.error('Error Removing document: ', error);
+        })
+
+    }
+
     const onReviewClicked = (e) => {
 
         const db = firebase.database();
@@ -64,6 +77,22 @@ export default function ReportView() {
         dataRef.set(dataVar);
         db.ref(`data/${id}/status`).set('Reviewed')
         navigate('/dashboard');
+    }
+
+    const onDraftClicked = (e) => {
+        const db = firebase.database();
+        const dataRef = db.ref(`data/${id}`);
+
+        if (goodIlluUpload != null || badIlluUpload != null) {
+            const st = firebase.storage();
+            const storageRef = st.ref(`${id}`);
+            const fileRef1 = storageRef.child(`/goodIlllu/${id}goodIllu.png`);
+            const fileRef2 = storageRef.child(`/badIllu/${id}badIllu.png`);
+            fileRef1.put(goodIlluUpload);
+            fileRef2.put(badIlluUpload);
+        }
+        console.log(dataVar);
+        dataRef.set(dataVar);
     }
 
     const onGenerateClicked = () => {
@@ -111,8 +140,10 @@ export default function ReportView() {
             .then((urls) => {
                 console.log(urls)
                 setImageURLs(urls);
-                setData({...data, illustration1: urls[0]});
-                dataVar = {...dataVar, illustration1: urls[0]};
+                if (urls[0] != undefined) {
+                    setData({...data, illustration1: urls[0]});
+                    dataVar = {...dataVar, illustration1: urls[0]};
+                }
             })
             .catch((error) => {
                 console.error('Error retrieveing images: ', error);
@@ -151,7 +182,8 @@ export default function ReportView() {
                             sx={{width: screenWidth*.5, marginBottom: 3, color: 'red'
                             }}
                             InputLabelProps={{ shrink: true,}}
-                            InputProps={{readOnly: true, sx: {color: 'black'}}}
+                            InputProps={{sx: {color: 'black'}}}
+                            onChange={changeHandler}
                             value={data.controlNumber}
                             ></TextField>
                             <TextField
@@ -160,7 +192,7 @@ export default function ReportView() {
                             label='Attention To'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             value={data.attentionTo}
                             ></TextField>
                             <TextField
@@ -170,7 +202,7 @@ export default function ReportView() {
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
                             value={data.facilityAffected}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             ></TextField>
                             <TextField
                             variant="standard"
@@ -178,7 +210,7 @@ export default function ReportView() {
                             label='Supplier'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             value={data.supplier}
                             ></TextField>
                             <TextField
@@ -187,7 +219,7 @@ export default function ReportView() {
                             label='Source'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             value={data.source}
                             ></TextField>
                             <TextField
@@ -196,7 +228,7 @@ export default function ReportView() {
                             label='P.O. Number'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             value={data.poNumber}
                             ></TextField>
                         </Box>
@@ -208,7 +240,7 @@ export default function ReportView() {
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
                             value={data.detectedAt}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             ></TextField>
                             <TextField
                             variant="standard"
@@ -216,7 +248,7 @@ export default function ReportView() {
                             label='Category'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             value={data.category}
                             ></TextField>
                             <TextField
@@ -225,7 +257,7 @@ export default function ReportView() {
                             label='Classification'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{readOnly: true}}
+                            onChange={changeHandler}
                             value={data.classification}
                             ></TextField>
                         </Box>
@@ -239,7 +271,7 @@ export default function ReportView() {
                         label='Defect Description'
                         sx={{width:screenWidth*.8, marginBottom: 3}}
                         InputLabelProps={{ shrink: true}}
-                        InputProps={{ readOnly: true}}
+                        onChange={changeHandler}
                         value={data.defectDescription}
                         >
                         </TextField>
@@ -252,7 +284,7 @@ export default function ReportView() {
                             label='Part Number'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.partNumber}
                             ></TextField>
                             <TextField
@@ -261,7 +293,7 @@ export default function ReportView() {
                             label='part Description'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.partDescription}
                             ></TextField>
                             <TextField
@@ -270,7 +302,7 @@ export default function ReportView() {
                             label='Datacode'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.datacode}
                             ></TextField>
                             <TextField
@@ -279,7 +311,7 @@ export default function ReportView() {
                             label='Data Received'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.dataReceived}
                             ></TextField>
                             <TextField
@@ -288,7 +320,7 @@ export default function ReportView() {
                             label='Affected Model/SKU'
                             sx={{width: screenWidth*.5, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.affectedModel}
                             ></TextField>
                         </Box>
@@ -299,7 +331,7 @@ export default function ReportView() {
                             label='Inspected Quantity'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.inspectedQty}
                             ></TextField>
                             <TextField
@@ -308,7 +340,7 @@ export default function ReportView() {
                             label='Detected Quantity'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.detectedQty}
                             ></TextField>
                             <TextField
@@ -317,7 +349,7 @@ export default function ReportView() {
                             label='Percent'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            InputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value= {data.percent}
                             ></TextField>
                             <TextField
@@ -326,7 +358,7 @@ export default function ReportView() {
                             label='Received Quantity'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            inputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.receivedQty}
                             ></TextField>
                             <TextField
@@ -335,7 +367,7 @@ export default function ReportView() {
                             label='Cell'
                             sx={{width: screenWidth*.3, marginBottom: 3}}
                             InputLabelProps={{ shrink: true}}
-                            inputProps={{ readOnly: true }}
+                            onChange={changeHandler}
                             value={data.cell}
                             ></TextField>
                         </Box>
@@ -490,7 +522,9 @@ export default function ReportView() {
                     <Box mt={2} mb={2} marginLeft='auto' display='flex'>
                         <Stack spacing={3} direction='row'>
                             <Button variant="contained" color='success' onClick={onReviewClicked}>Review</Button>
+                            <Button variant='contained' color='success' onClick={onDraftClicked}>Save Draft</Button>
                             <Button variant="contained" color='success' onClick={onGenerateClicked}>Generate PDF</Button>
+                            <Button variant="contained" color='success' onClick={onRemoveClicked}>Remove</Button>
                             <Button variant="outlined" color='success' onClick={routeChange}>Cancel</Button>
                         </Stack>
                     </Box>

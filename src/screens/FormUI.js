@@ -56,7 +56,7 @@ export default function FormUI() {
         setData({...data, [e.target.id]: e.target.value})
     };
 
-    const issueDateHandler = (date) => { setData({...data, issueDate: `${date.$D}-${date.$M}-${date.$y}`}); };
+    const issueDateHandler = (date) => { setData({...data, issueDate: `${date.$D}-${date.$M+1}-${date.$y}`}); };
 
     let navigate = useNavigate();
     const onButtonClicked = (e) => {
@@ -71,7 +71,6 @@ export default function FormUI() {
         }
         newDataRef.set(data);
         navigate('/finish');
-        
     };
 
     useEffect(() => {

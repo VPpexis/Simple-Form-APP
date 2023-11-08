@@ -15,7 +15,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import logo from '../assets/schnieder_logo_white.png';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home'];
+const pages = ['Home', 'Admin'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function ResponsiveAppBar() {
@@ -23,8 +23,13 @@ function ResponsiveAppBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   let navigate = useNavigate();
-  const routeChange = () => {
+  const routeHomeChange = () => {
     let path = '/';
+    navigate(path);
+  }
+  
+  const routeDashboardChange = () => {
+    let path = '/dashboard';
     navigate(path);
   }
 
@@ -35,8 +40,13 @@ function ResponsiveAppBar() {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
-    routeChange();
+  const handleCloseNavMenu = (e) => {
+    if (e.target.id == 'Home'){
+      routeHomeChange();
+    }
+    if (e.target.id == 'Admin') {
+      routeDashboardChange();
+    }
     setAnchorElNav(null);
   };
 
@@ -59,6 +69,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
+                id={page}
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}

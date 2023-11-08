@@ -1,0 +1,20 @@
+
+.buttonStyle button {
+    padding: 0.5rem;
+    border-radius: 5px;
+    display: flex;
+    border: none;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttonStyle button:hover {
+    background: var(--primary-color);
+}
+
+.buttonStyle .content {
+    padding: 0.5rem;
+    display: flex;
+    width: 10;
+    background: #f7f7f7;
+}

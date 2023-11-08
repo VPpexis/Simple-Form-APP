@@ -5,6 +5,7 @@ import { Route, Router, Routes } from 'react-router-dom';
 import TopNav from './components/TopNav.js';
 import FormUI from './/screens/FormUI.js';
 import FinishUI from './/screens/FinishUI.js';
+import BarChartButton from './components/BarChartButton/BarChartButton';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path='/finish' element={<FinishUI />}></Route>
           <Route path='/dashboard' element={<DashboardPage />}></Route>
           <Route path='/dashboard/report/:id' element={<ReportPage />}></Route>
+          <Route path='/button' element={<BarChartButton />}></Route>
         </Routes>
       </div>
   );
