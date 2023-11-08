@@ -1,10 +1,18 @@
-# Getting Started with Create React App
+# Simple Forms APP
+This app is a simple forms app that utilized Firebases. Firebases Realtime Database provides the application's database in saving the data. Firebase Storage is utilized for allowing image to be uploaded and attached into the data. Firebase Hosting is utilized for hosting the web app.
+![](https://i.imgur.com/OJn4gwK.png)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Getting Started
 
-## Available Scripts
+### Dependencies
+* React
+* Firebase
+* pdf-lib
 
-In the project directory, you can run:
+### Installing
+* `git clone`
+* Run `npm ci`
+* Run `npm start`
 
 ### `npm start`
 
