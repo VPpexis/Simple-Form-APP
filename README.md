@@ -1,4 +1,6 @@
-# Getting Started with Create React App
+# Simple Forms APP
+This app is a simple forms app that utilized Firebases. Firebases Realtime Database provides the application's database in saving the data. Firebase Storage is utilized for allowing image to be uploaded and attached into the data. Firebase Hosting is utilized for hosting the web app.
+![](https://i.imgur.com/OJn4gwK.png)
 
 ![Imgur](https://i.imgur.com/UafQV3o.png)
 ![](https://i.imgur.com/7yoXpdW.png)
@@ -9,15 +11,15 @@ The project is a simple form logging web app. Allows user to input data into the
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Cloud Infrastructure Design
+### Dependencies
+* React
+* Firebase
+* pdf-lib
 
-![](https://i.imgur.com/nd68PzC.png)
-
-The web app utilizes the following firebase services: Firebase Realtime Database, Firebase Storage, and Firebase Hosting. Firebase Realtime Database is a NoSQL cloud-hosted database provided by Firebase. It allows developers to store and synchronize data in real-time across multiple clients, such as web and mobile applications. Firebase Storage is a cloud storage service provided by Firebase. It allows developers to store and serve user-generated content, such as images, videos, and other files, in a secure and scalable manner. Firebase Hosting is a service provided by Firebase that allows developers to easily host their web applications and static content. It provides a fast and secure way to deploy and serve web assets such as HTML, CSS, JavaScript, and images.
-
-## Available Scripts
-
-In the project directory, you can run:
+### Installing
+* `git clone`
+* Run `npm ci`
+* Run `npm start`
 
 ### `npm start`
 
